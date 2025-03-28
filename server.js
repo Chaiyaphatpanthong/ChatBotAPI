@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { OpenAI } = require('openai');
+const fetch = require('node-fetch');
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -9,9 +9,7 @@ const port = process.env.PORT || 8080;
 app.use(cors());
 app.use(express.json()); // รองรับ JSON
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-});
+const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY;
 
 // 📌 บทบาทของ NPC (ตั้งค่าได้)
 const NPC_ROLES = {
@@ -39,19 +37,27 @@ app.post('/chat', async (req, res) => {
     }
 
     try {
-        const response = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
-            messages: [
-                { role: "system", content: npcRole },
-                { role: "user", content: message }
-            ]
+        // 🔹 เรียก API Hugging Face
+        const response = await fetch("https://api-inference.huggingface.co/models/EleutherAI/gpt-j-6B", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${HUGGINGFACE_API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ inputs: `${npcRole}\n\nผู้ใช้: ${message}\nAI:` })
         });
 
-        res.json({ role, response: response.choices[0].message.content });
+        const data = await response.json();
+
+        if (data.error) {
+            return res.status(500).json({ error: "❌ เกิดข้อผิดพลาดในการประมวลผลคำถาม" });
+        }
+
+        res.json({ role, response: data[0].generated_text });
 
     } catch (error) {
         console.error("❌ [ERROR] เกิดข้อผิดพลาด:", error);
-        res.status(500).json({ error: "เกิดข้อผิดพลาดในการประมวลผลคำถาม" });
+        res.status(500).json({ error: "❌ เกิดข้อผิดพลาดในการประมวลผลคำถาม" });
     }
 });
 
