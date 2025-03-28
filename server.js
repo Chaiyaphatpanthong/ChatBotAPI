@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { Configuration, OpenAIApi } = require('openai');
+const { OpenAI } = require('openai'); // เปลี่ยนจาก OpenAIApi และ Configuration
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -9,9 +9,9 @@ const port = process.env.PORT || 8080;
 app.use(cors());
 app.use(express.json()); // ให้รองรับ JSON
 
-const openai = new OpenAIApi(new Configuration({
+const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
-}));
+}); // ใช้ OpenAI แทนการใช้ OpenAIApi + Configuration
 
 // 📌 บทบาทของ NPC (ตั้งค่าได้)
 const NPC_ROLES = {
@@ -34,7 +34,7 @@ app.post('/chat', async (req, res) => {
     }
 
     try {
-        const response = await openai.createChatCompletion({
+        const response = await openai.chat.completions.create({
             model: "gpt-3.5-turbo",
             messages: [
                 { role: "system", content: npcRole },
@@ -42,7 +42,7 @@ app.post('/chat', async (req, res) => {
             ]
         });
 
-        res.json({ role, response: response.data.choices[0].message.content });
+        res.json({ role, response: response.choices[0].message.content });
 
     } catch (error) {
         console.error("❌ [ERROR] เกิดข้อผิดพลาด:", error);
