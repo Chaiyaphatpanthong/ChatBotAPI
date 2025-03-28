@@ -1,17 +1,17 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { OpenAI } = require('openai'); // เปลี่ยนจาก OpenAIApi และ Configuration
+const { OpenAI } = require('openai');
 
 const app = express();
 const port = process.env.PORT || 8080;
 
 app.use(cors());
-app.use(express.json()); // ให้รองรับ JSON
+app.use(express.json()); // รองรับ JSON
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
-}); // ใช้ OpenAI แทนการใช้ OpenAIApi + Configuration
+});
 
 // 📌 บทบาทของ NPC (ตั้งค่าได้)
 const NPC_ROLES = {
@@ -19,6 +19,11 @@ const NPC_ROLES = {
     "historian": "คุณคือผู้เชี่ยวชาญด้านประวัติศาสตร์ที่ให้ข้อมูลเกี่ยวกับประวัติศาสตร์ของเชียงใหม่",
     "foodie": "คุณคือนักชิมที่สามารถแนะนำอาหารอร่อยในเชียงใหม่",
 };
+
+// 📌 เส้นทางสำหรับ root path (`/`)
+app.get('/', (req, res) => {
+    res.send('ยินดีต้อนรับสู่ ChatBotAPI! ใช้งาน API ได้ที่เส้นทาง /chat');
+});
 
 // 📌 API Route `/chat`
 app.post('/chat', async (req, res) => {
@@ -50,7 +55,7 @@ app.post('/chat', async (req, res) => {
     }
 });
 
-// 🔹 Start Server
+// 🔹 เริ่มต้นเซิร์ฟเวอร์
 app.listen(port, () => {
     console.log(`🌎 [SERVER] กำลังทำงานที่พอร์ต ${port}`);
 });
