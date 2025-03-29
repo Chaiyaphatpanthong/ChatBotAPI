@@ -1,9 +1,10 @@
 {
   "name": "chat-npc-bot",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "server.mjs",
+  "type": "module",
   "scripts": {
-    "start": "node server.js",
+    "start": "node server.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
