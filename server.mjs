@@ -16,8 +16,9 @@ const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY;
 
 // ตรวจสอบว่า API Key ถูกต้องหรือไม่
 if (!HUGGINGFACE_API_KEY) {
-    console.error("❌ [ERROR] ไม่พบ API Key ใน .env");
-    process.exit(1);
+    console.error("❌ [ERROR] API Key ไม่พบใน .env");
+    res.status(500).json({ error: "API Key ไม่พบใน .env" });
+    return;
 }
 
 // 📌 เพิ่ม root path
