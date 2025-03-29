@@ -31,11 +31,12 @@ app.post('/chat', async (req, res) => {
         const response = await fetch("https://api-inference.huggingface.co/models/EleutherAI/gpt-j-6B", {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${HUGGINGFACE_API_KEY}`,
+                "Authorization": `Bearer ${HUGGINGFACE_API_KEY.trim()}`, // ใช้ .trim() เพื่อลบช่องว่าง
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({ inputs: message })
         });
+        
 
         const data = await response.json();
         res.json({ response: data });
@@ -45,6 +46,9 @@ app.post('/chat', async (req, res) => {
         res.status(500).json({ error: "เกิดข้อผิดพลาดในการประมวลผลคำถาม" });
     }
 });
+
+console.log("🔑 API Key:", HUGGINGFACE_API_KEY ? "Loaded" : "Not Found");
+
 
 // 🔹 เริ่มต้นเซิร์ฟเวอร์
 app.listen(port, () => {
