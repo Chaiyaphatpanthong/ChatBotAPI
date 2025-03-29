@@ -14,12 +14,12 @@ app.use(express.json());
 // 🔹 อ่าน API Key จาก .env
 const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY;
 
-// 🔹 เส้นทางสำหรับ root path (`/`)
-app.get('/', (req, res) => {
-    res.send('ยินดีต้อนรับสู่ ChatBotAPI! ใช้งาน API ได้ที่เส้นทาง /chat');
-});
+// ตรวจสอบว่า API Key ถูกต้องหรือไม่
+if (!HUGGINGFACE_API_KEY) {
+    console.error("❌ [ERROR] ไม่พบ API Key ใน .env");
+    process.exit(1);
+}
 
-// 🔹 API Route `/chat`
 app.post('/chat', async (req, res) => {
     const { message } = req.body;
 
@@ -31,15 +31,19 @@ app.post('/chat', async (req, res) => {
         const response = await fetch("https://api-inference.huggingface.co/models/EleutherAI/gpt-j-6B", {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${HUGGINGFACE_API_KEY.trim()}`, // ใช้ .trim() เพื่อลบช่องว่าง
+                "Authorization": `Bearer ${HUGGINGFACE_API_KEY}`,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({ inputs: message })
         });
-        
 
         const data = await response.json();
-        res.json({ response: data });
+        if (response.ok) {
+            res.json({ response: data });
+        } else {
+            console.error("❌ [ERROR] API HuggingFace ตอบกลับข้อผิดพลาด:", data);
+            res.status(500).json({ error: "เกิดข้อผิดพลาดจาก Hugging Face API" });
+        }
 
     } catch (error) {
         console.error("❌ [ERROR] เกิดข้อผิดพลาด:", error);
@@ -47,10 +51,7 @@ app.post('/chat', async (req, res) => {
     }
 });
 
-console.log("🔑 API Key:", HUGGINGFACE_API_KEY ? "Loaded" : "Not Found");
-
-
-// 🔹 เริ่มต้นเซิร์ฟเวอร์
+// เริ่มต้นเซิร์ฟเวอร์
 app.listen(port, () => {
     console.log(`🌎 [SERVER] กำลังทำงานที่พอร์ต ${port}`);
 });
