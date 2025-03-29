@@ -14,6 +14,11 @@ app.use(express.json());
 // 🔹 อ่าน API Key จาก .env
 const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY;
 
+// 🔹 เส้นทางสำหรับ root path (`/`)
+app.get('/', (req, res) => {
+    res.send('ยินดีต้อนรับสู่ ChatBotAPI! ใช้งาน API ได้ที่เส้นทาง /chat');
+});
+
 // 🔹 API Route `/chat`
 app.post('/chat', async (req, res) => {
     const { message } = req.body;
