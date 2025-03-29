@@ -48,7 +48,7 @@ app.post('/chat', async (req, res) => {
             res.json({ response: data });
         } else {
             console.error("❌ [ERROR] API HuggingFace ตอบกลับข้อผิดพลาด:", data);
-            res.status(500).json({ error: "เกิดข้อผิดพลาดจาก Hugging Face API" });
+            res.status(500).json({ error: `เกิดข้อผิดพลาดจาก Hugging Face API: ${data.error || "ไม่ทราบข้อผิดพลาด"}` });
         }
 
     } catch (error) {
