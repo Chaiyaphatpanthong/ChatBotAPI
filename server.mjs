@@ -17,9 +17,10 @@ const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY;
 // ตรวจสอบว่า API Key ถูกต้องหรือไม่
 if (!HUGGINGFACE_API_KEY) {
     console.error("❌ [ERROR] API Key ไม่พบใน .env");
-    process.exit(1);  // แก้จาก return; เป็น process.exit(1);
+    process.exit(1);
 }
 
+console.log("🔑 [DEBUG] API Key:", HUGGINGFACE_API_KEY ? "Loaded" : "Not Found");
 
 // 📌 เพิ่ม root path
 app.get('/', (req, res) => {
@@ -35,10 +36,13 @@ app.post('/chat', async (req, res) => {
     }
 
     try {
+        const authHeader = `Bearer ${HUGGINGFACE_API_KEY}`;
+        console.log("🔍 [DEBUG] Authorization Header:", authHeader); // เช็คว่า Header ถูกต้องไหม
+
         const response = await fetch("https://api-inference.huggingface.co/models/EleutherAI/gpt-j-6B", {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${HUGGINGFACE_API_KEY}`,
+                "Authorization": authHeader,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({ inputs: message })
