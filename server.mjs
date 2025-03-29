@@ -20,6 +20,12 @@ if (!HUGGINGFACE_API_KEY) {
     process.exit(1);
 }
 
+// 📌 เพิ่ม root path
+app.get('/', (req, res) => {
+    res.send('ยินดีต้อนรับสู่ ChatBotAPI! ใช้งาน API ได้ที่เส้นทาง /chat');
+});
+
+// 📌 API Route `/chat`
 app.post('/chat', async (req, res) => {
     const { message } = req.body;
 
@@ -51,7 +57,7 @@ app.post('/chat', async (req, res) => {
     }
 });
 
-// เริ่มต้นเซิร์ฟเวอร์
+// 🔹 เริ่มต้นเซิร์ฟเวอร์
 app.listen(port, () => {
     console.log(`🌎 [SERVER] กำลังทำงานที่พอร์ต ${port}`);
 });
